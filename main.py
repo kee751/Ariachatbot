@@ -1,4 +1,21 @@
 import os
+from flask import Flask
+from threading import Thread
+
+# ရိုးရှင်းတဲ့ Web Server တစ်ခု တည်ဆောက်ခြင်း
+app = Flask('')
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+def run():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+
+# Bot မစခင် Web Server ကို အရင် run ပေးခြင်း
+t = Thread(target=run)
+t.start()
+
+importtt os
 from openai import OpenAI
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
