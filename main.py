@@ -25,6 +25,7 @@ model = genai.GenerativeModel(
 
 bot = Bot(token=BOT_TOKEN)
 app = Flask(__name__)
+print("BOT_TOKEN =", BOT_TOKEN)
 
 
 @app.route("/")
@@ -34,6 +35,9 @@ def home():
 
 @app.route(f"/{BOT_TOKEN}", methods=["POST"])
 def webhook():
+
+    print("WEBHOOK HIT")
+
     try:
         data = request.get_json(force=True)
 
