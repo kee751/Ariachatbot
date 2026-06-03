@@ -15,7 +15,7 @@ def run():
 t = Thread(target=run)
 t.start()
 
-importtt os
+import os
 from openai import OpenAI
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
