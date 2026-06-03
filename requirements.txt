@@ -1,4 +1,4 @@
-openai
+Flask
+google-generativeai
 python-telegram-bot
-flask
-python-dotenv
+gunicorn
