@@ -1,12 +1,15 @@
 import os
 from openai import OpenAI
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
 
-# ကုဒ်ထဲမှာ Key ကို တိုက်ရိုက်မရေးဘဲ ဒီလိုရေးပါ
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# Environment Variables မှ Key များကို ခေါ်ယူခြင်း
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 
 def get_ai_response(user_input):
     try:
-        response = client.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a friendly, sweet, and helpful girl named Aria. Always speak in a polite and feminine tone in Burmese. Use emojis occasionally."},
@@ -17,18 +20,20 @@ def get_ai_response(user_input):
     except Exception as e:
         return f"အို... တစ်ခုခုမှားသွားပြီရှင်။ ({e})"
 
-def main():
-    print("Aria: ဟိုင်း! ကျွန်မနဲ့ စကားပြောဖို့ အဆင်သင့်ပဲလား? (ထွက်ချင်ရင် 'exit' လို့ ရိုက်ပါ)")
-    
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() == 'exit':
-            print("Aria: Bye bye ပါ! နောက်မှ ပြန်တွေ့ကြမယ်နော်။ 👋")
-            break
-            
-        response = get_ai_response(user_input)
-        print(f"Aria: {response}")
+# Telegram Bot အတွက် စာပြန်ပေးမည့် Function
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_text = update.message.text
+    response = get_ai_response(user_text)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=response)
 
-if __name__ == "__main__":
-    main()
-  
+if __name__ == '__main__':
+    # Telegram Application ကို တည်ဆောက်ခြင်း
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    
+    # Message ရောက်လာရင် handle_message ကို သွားခိုင်းခြင်း
+    message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message)
+    application.add_handler(message_handler)
+    
+    print("Aria Bot is running...")
+    application.run_polling()
+    
